@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<style>
+#container{
+    width: 1000px;
+    height: 630px;
+    background-image: url(../images/universe.jpg);
+    background-size: 1000px 2000px;
+    margin: auto;
+    position: relative;
+}
+</style>
+<script src="GameObject.js"></script>
+<script src="./Hero.js"></script>
+<script src="Bullet.js"></script>
+<script src="./Enemy.js"></script>
+<script src="../js/lib.js"></script>
+<script>
+var container;
+var bgY=0;
+var bulletArray=new Array(); //총알을 담게될 배열
+var hero;
+var enemyArray=[]; //이방법도 있다 new array;
+addEventListener("load",function(){
+    container=document.getElementById("container");
+    createHero();
+    createEnemy();
+    gameLoop();
+
+    //키보드 이벤트 구현
+    document.body.addEventListener("keydown",function(e){
+        var key =e.keyCode;
+        switch(key){
+            case 32: fire(); break;
+            case 37: hero.velX=-5; break;
+            // case 38: hero.velY=-5; break;
+            case 39: hero.velX=5; break;
+            // case 40: hero.velY=5; break;
+        }
+    })
+    document.body.addEventListener("keyup",function(e){
+        var key =e.keyCode;
+        switch(key){
+            case 37: hero.velX=0; break;
+            // case 38: hero.velY=0; break;
+            case 39: hero.velX=0; break;
+            // case 40: hero.velY=0; break;
+        }
+    })
+
+});
+//총알 발사
+function fire(){
+    var bullet = new Bullet(container,"../images/gallerxy/bullet.png",10,20,0,-6,hero.x+hero.width/3,530);
+    bulletArray.push(bullet);
+}
+
+//주인공 등장
+function createHero(){
+    //constructor(container,src,width,height,velX,velY,x,y)
+    hero = new Hero(container,"../images/gallerxy/ship.png",50,40,0,0,460,570);
+}
+
+//적군 등장
+function createEnemy(){
+    //두줄로 출력시 즉 행과 열이 다수 존재할때는 == 테이블 구조
+    //이중 포문이 적절하다!
+    for(var a=0; a<5; a++){ //y축
+        for(var i=0; i<15; i++){ //x축
+        var enemy = new Enemy(container,"../images/gallerxy/enermy1.png",40,40,0,0,(100+i*50),50+(a*50));
+        enemyArray.push(enemy); //배열안으로 생성된 적군 추가
+    }
+    }
+}
+
+//배경처리(y축방향으로 처리되는 종스크롤 게임)
+function moveBg(){
+    bgY++;
+    container.style.backgroundPosition="0px "+bgY+"px";
+}
+
+function gameLoop(){
+    // console.log("gameLoop() called..");
+    moveBg();
+    hero.tick();
+    hero.render();
+
+    //게임 오브젝트들에 대한 tick(), render() 호출
+    for(var i=0; i<bulletArray.length; i++){
+        bulletArray[i].tick();
+    }
+    for(var i=0; i<bulletArray.length; i++){
+        bulletArray[i].render();
+    }
+
+    setTimeout("gameLoop()",10);
+}
+</script>
+</head>
+<body>
+    <div id="container"></div>
+</body>
+</html>
